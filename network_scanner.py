@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import scapy.all as scapy
 import argparse
+import requests
+import requests.exceptions as RequestException
+import time
 
 """
 
@@ -31,10 +34,20 @@ def scan(ip):
     return client_list
 
 
+def getManufacturer(mac_add):
+    try:
+        manufacturer_req = requests.get(
+            f"https://api.macvendors.com/{mac_add}", timeout=1.50)
+        time.sleep(2)    
+        return manufacturer_req.text
+    except RequestException:
+        return "-"
+
+
 def print_scan_result(list):
-    print("IP\t\t\tMac")
+    print("IP\t\t\tMac\t\t\tManufacturer")
     for client in list:
-        print(f"{client['ip']}\t\t{client['mac']}")
+        print(f"{client['ip']}\t\t{client['mac']}\t{getManufacturer(client['mac'])}")
 
 
 if __name__ == "__main__":
